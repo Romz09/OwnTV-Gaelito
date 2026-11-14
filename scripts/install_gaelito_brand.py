@@ -54,6 +54,9 @@ def main():
         xml = re.sub(
             r'(<item name="windowSplashScreenAnimatedIcon">)@drawable/[^<]+(</item>)',
             r'\1@drawable/gaelito_tv_splash\2', xml)
+        xml = re.sub(
+            r'(<item name="android:windowSplashScreenBrandingImage">)@drawable/[^<]+(</item>)',
+            r'\1@drawable/gaelito_tv_banner\2', xml)
         path.write_text(xml, encoding="utf-8")
     print("Gaelito TV visual resources installed. Run ./gradlew :app:assembleDebug to verify.")
 
