@@ -58,7 +58,7 @@ def main():
             r'(<item name="android:windowSplashScreenBrandingImage">)@drawable/[^<]+(</item>)',
             r'\1@drawable/gaelito_tv_banner\2', xml)
         path.write_text(xml, encoding="utf-8")
-    print("Gaelito TV visual resources installed. Run ./gradlew :app:assembleDebug to verify.")
+    print("Gaelito TV visual resources installed. Run ./gradlew assembleStandardDebug to verify.")
 
 if __name__ == "__main__":
     main()
