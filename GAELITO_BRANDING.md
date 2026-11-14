@@ -21,3 +21,6 @@ Esta rama adapta la identidad visual de OwnTV para **Gaelito TV** sin cambiar el
 5. Ejecutar pruebas de Gradle, verificar contraste, splash, navegación D-pad, tema claro y oscuro en Android TV.
 
 **Aviso:** cambios de apariencia iniciales, no una personalización completa ni un APK validado. Se mantienen las atribuciones y licencia GPLv3.
+
+## Mascota visual aprobada (14 de noviembre de 2026)
+El diseño aprobado es un bebé caricaturesco sonriente con gorra azul, guiño, pulgar arriba y televisor rotulado «Gaelito TV». Los archivos PNG preparados son `gaelito_tv_logo.png`, `gaelito_tv_icon_512.png` y `gaelito_tv_banner_1280x720.png` (entregados por separado; todavía no integrados en recursos Android de esta rama). Antes de sustituir iconos y banners, validar encuadre en launcher Android TV y adaptar variantes y splash existentes.
