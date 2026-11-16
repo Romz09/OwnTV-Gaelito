@@ -1,0 +1,60 @@
+name: Gaelito TV branded APK (preview)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/src/main/res/gaelito_tv_*.png'
+      - 'scripts/install_gaelito_brand.py'
+      - '.github/workflows/gaelito-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  branded-apk:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'branding/gaelito-tv' || github.head_ref == 'feature/gaelito-performance'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout approved branding branch
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Pillow
+        run: python3 -m pip install --user Pillow
+
+      - name: Install approved Gaelito TV visual assets
+        run: |
+          python3 scripts/install_gaelito_brand.py app/src/main/res
+          test -s app/src/main/res/mipmap-xxxhdpi/gaelito_tv_icon.png
+          test -s app/src/main/res/drawable-nodpi/gaelito_tv_banner.png
+          test -s app/src/main/res/drawable-nodpi/gaelito_tv_splash.png
+          grep -q '@mipmap/gaelito_tv_icon' app/src/main/AndroidManifest.xml
+          grep -q '@drawable/gaelito_tv_splash' app/src/main/res/values-v31/themes.xml
+
+      - name: Build Android TV ARM debug APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleStandardDebug --stacktrace
+
+      - name: Upload Gaelito TV APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gaelito-TV-AndroidTV-Preview
+          path: app/build/outputs/apk/standard/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14

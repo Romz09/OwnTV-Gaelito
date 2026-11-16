@@ -228,7 +228,7 @@ internal fun ChannelListPanel(
             playing != null -> listOfNotNull(
                 stringResource(R.string.shell_now_playing),
                 playing.number?.toString()?.takeIf { showNumbers },
-                ProviderTags.parse(playing.name).name,
+                remember(playing.name) { ProviderTags.parse(playing.name).name },
             ).joinToString(" · ")
             else -> null
         }
@@ -263,9 +263,12 @@ internal fun ChannelListPanel(
             itemsIndexed(channels, key = { _, ch -> ch.id }) { index, ch ->
                 val isPlaying = index == playingIndex
                 val nowMs = remember { System.currentTimeMillis() }
+                // Parsing provider tags is pure but allocates; reuse the result while a row
+                // is recomposed for focus, EPG updates or playback state changes.
+                val parsedName = remember(ch.name) { ProviderTags.parse(ch.name) }
                 LiveStageRow(
                     channel = ch,
-                    name = ProviderTags.parse(ch.name),
+                    name = parsedName,
                     now = nowProgrammes[ch.id],
                     nowTitle = nowPlaying[ch.id],
                     isFavorite = ch.id in favoriteIds,

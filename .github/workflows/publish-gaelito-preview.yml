@@ -1,0 +1,56 @@
+name: Publish Gaelito TV test APK
+
+on:
+  push:
+    branches: [branding/gaelito-tv]
+    paths:
+      - '.github/workflows/publish-gaelito-preview.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-gaelito-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish-preview:
+    if: github.repository == 'Romz09/OwnTV-Gaelito' && (github.ref == 'refs/heads/branding/gaelito-tv' || (github.event_name == 'pull_request' && github.head_ref == 'feature/gaelito-performance'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download successfully built preview APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p preview
+          if [ "${{ github.head_ref }}" = "feature/gaelito-performance" ]; then
+            run_id=43942931582
+          else
+            run_id=43670219304
+          fi
+          gh run download "$run_id" --repo "${{ github.repository }}" --name Gaelito-TV-AndroidTV-Preview --dir preview
+          ls -lah preview
+          test "$(find preview -name '*.apk' -type f | wc -l)" -eq 1
+
+      - name: Publish public prerelease without modifying main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          apk="$(find preview -name '*.apk' -type f | head -n 1)"
+          cp "$apk" Gaelito-TV-AndroidTV-Preview.apk
+          if [ "${{ github.head_ref }}" = "feature/gaelito-performance" ]; then
+            tag="gaelito-tv-performance-7bcd87f"
+            target="feature/gaelito-performance"
+          else
+            tag="gaelito-tv-preview-704c535b"
+            target="branding/gaelito-tv"
+          fi
+          if gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release upload "$tag" Gaelito-TV-AndroidTV-Preview.apk --clobber --repo "${{ github.repository }}"
+          else
+            gh release create "$tag" Gaelito-TV-AndroidTV-Preview.apk --repo "${{ github.repository }}" --target "$target" --title "Gaelito TV Android TV - Preview" --notes "APK de prueba Gaelito TV, compilacion Android CI 43942931582 en rama de rendimiento. No modifica main." --prerelease
+          fi
+          echo "Public APK: https://github.com/${{ github.repository }}/releases/download/$tag/Gaelito-TV-AndroidTV-Preview.apk"
