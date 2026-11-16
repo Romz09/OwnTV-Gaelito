@@ -228,7 +228,7 @@ internal fun ChannelListPanel(
             playing != null -> listOfNotNull(
                 stringResource(R.string.shell_now_playing),
                 playing.number?.toString()?.takeIf { showNumbers },
-                ProviderTags.parse(playing.name).name,
+                remember(playing.name) { ProviderTags.parse(playing.name).name },
             ).joinToString(" · ")
             else -> null
         }
