@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   branded-apk:
-    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'branding/gaelito-tv'
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'branding/gaelito-tv' || github.head_ref == 'feature/gaelito-performance'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout approved branding branch
